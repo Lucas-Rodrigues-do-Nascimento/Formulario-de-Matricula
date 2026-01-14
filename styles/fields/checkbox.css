@@ -1,39 +1,159 @@
+/* =========================================================
+   checkbox.css (COMENTADO) — checkbox custom (Termos e Condições)
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Cria um checkbox “customizado” usando uma imagem (SVG) no lugar do checkbox nativo
+   - Mantém o <input type="checkbox"> real (para funcionalidade e acessibilidade),
+     mas remove o visual padrão com CSS
+   - Controla estados visuais:
+     - normal (default)
+     - hover/focus (hover)
+     - marcado (checked)
+
+   🔎 Onde aparece no HTML:
+   - Bloco completo:
+     <div class="terms-wrapper input-wrapper checkbox-wrapper">
+       <div class="checkbox-image"></div>
+       <input type="checkbox" name="terms" id="terms">
+       <label for="terms">... <strong>...</strong> ...</label>
+     </div>
+
+   🔗 Relação com outros arquivos:
+   - global.css fornece variáveis:
+     --text-highlight (cor do <strong>)
+   - input.css estiliza label e tipografia base do site (por herança no body).
+   - forms.css define espaçamento macro do formulário; aqui é o componente checkbox.
+========================================================= */
+
+
+/* =========================
+   Container do bloco de termos
+   ========================= */
+
 .terms-wrapper {
     margin-top: 3rem;
+    /* Dá espaço acima do bloco de termos.
+     Onde no HTML:
+     - ele vem depois do último fieldset e antes dos botões (.actions-wrapper).
+     Isso separa bem “opções” e “termos”. */
+
     display: flex;
+    /* CONCEITO: Flexbox (layout 1D)
+     Aqui você quer alinhar:
+     - ícone do checkbox (checkbox-image)
+     - texto (label)
+     em linha. */
+
     gap: .75rem;
+    /* Espaço entre o “quadradinho” e o texto do termo. */
+
     align-items: flex-start;
+    /* Alinha os itens no topo (começo).
+     Isso é importante porque o texto do label pode quebrar em várias linhas;
+     com flex-start, o checkbox fica alinhado no topo do texto. */
 
     & strong {
         font-weight: 500;
+        /* Define um destaque moderado (não tão forte quanto 600/700). */
+
         color: var(--text-highlight);
+        /* Cor de destaque do design.
+       Variável vem do global.css (:root). */
+
+        /* Onde no HTML:
+       - <strong>Termos e Condições</strong>
+       - <strong>Política de Privacidade</strong>
+       Assim, só esses trechos ficam com a cor principal do tema. */
     }
 }
 
+
+/* =========================
+   Container que “monta” o checkbox custom
+   ========================= */
+
 .checkbox-wrapper {
     position: relative;
+    /* CONCEITO: relative
+     - Serve como referência para elementos position:absolute dentro dele.
+     Isso é necessário para o input invisível cobrir a área certa. */
 
     & [type="checkbox"] {
         all: unset;
+        /* CONCEITO: reset total
+       - Remove estilos padrões do input checkbox (a “caixinha” nativa).
+       - Isso é comum em custom checkboxes.
+       ⚠️ Atenção: all: unset remove também estilos de foco padrão do browser,
+       então você precisa tratar foco (você faz com :focus-within). */
+
         position: absolute;
+        /* Coloca o input por cima do componente para ser clicável. */
+
         inset: 0;
+        /* CONCEITO: inset
+       - atalho para top/right/bottom/left = 0
+       - faz o input cobrir toda a área do wrapper */
     }
 
     .checkbox-image {
         flex: 0 0 1.5rem;
+        /* CONCEITO: flex shorthand (flex-grow flex-shrink flex-basis)
+       - 0: não cresce
+       - 0: não encolhe
+       - 1.5rem: largura fixa
+       Resultado: a “caixinha” tem largura fixa e o texto fica ao lado. */
+
         height: 1.5rem;
+        /* Altura fixa para formar um quadrado (1.5rem x 1.5rem). */
 
         background-image: url(../../assets/icons/checkbox-default.svg);
+        /* Ícone default do checkbox.
+       Caminho relativo ao checkbox.css:
+       styles/fields/checkbox.css -> ../../assets/icons/checkbox-default.svg */
     }
 
     &:hover,
     &:focus-within {
+        /* CONCEITO: estados do componente
+       - :hover: quando passa o mouse (desktop)
+       - :focus-within: quando o input (ou qualquer elemento dentro) está focado
+         (acessibilidade via teclado) */
+
         .checkbox-image {
             background-image: url(../../assets/icons/checkbox-hover.svg);
+            /* Troca o ícone para o estado “hover/focus”. */
         }
     }
 
     &:has(:checked) .checkbox-image {
+        /* CONCEITO: :has()
+       - Seleciona o pai (.checkbox-wrapper) se ele contém um filho :checked.
+       - Se o input checkbox está marcado, troca a imagem do quadradinho.
+
+       ⚠️ Compatibilidade:
+       - :has() é moderno. Em browsers antigos pode não funcionar.
+       - Em Live Server (CSS puro) isso não dá erro de chave, mas pode variar por navegador. */
+
         background-image: url(../../assets/icons/checkbox-checked.svg);
+        /* Ícone do estado “marcado”. */
     }
 }
+
+/* =========================================================
+   NOTAS DE ESTUDO (importantes)
+   =========================================================
+   1) Por que usar input invisível em vez de esconder com display:none?
+      - display:none remove do fluxo e pode quebrar acessibilidade/label.
+      - Aqui o input existe e continua funcional; só o visual é substituído.
+
+   2) Por que position:absolute + inset:0 no input?
+      - Para tornar TODO o bloco clicável, não apenas o quadradinho.
+
+   3) Por que :focus-within é importante?
+      - Sem isso, quem usa teclado não teria feedback visual ao focar.
+
+   4) Atenção com all: unset
+      - Você remove os estilos padrão (ok), mas precisa garantir que:
+        a) o label continue clicável (você tem for="terms")
+        b) exista algum feedback de foco (você tem :focus-within)
+========================================================= */

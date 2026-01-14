@@ -1,27 +1,195 @@
+/* =========================================================
+   forms.css (COMENTADO) — organização do formulário
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Define espaçamentos gerais do <form>
+   - Define a estrutura das seções (<fieldset> e <legend>)
+   - Define o layout da área de ações (.actions-wrapper) com botões
+   - Ajusta os botões para mobile (empilhar e ocupar 100%)
+
+
+   🔎 Onde aparece no HTML:
+   - form: <form method="post" enctype="multipart/form-data"> ... </form>
+   - fieldset: várias seções (child-info, address, gardian, enroll-options)
+   - legend: títulos dentro de cada fieldset
+   - .actions-wrapper: <div class="actions-wrapper"> ... botões ... </div>
+
+   🔗 Relação com outros CSS:
+   - fields/index.css (importado aqui) puxa estilos dos componentes:
+     - fields/input.css (inputs, labels, validação)
+     - fields/buttons.css (btn-primary / btn-secondary)
+     - fields/radio.css (cards de rádio)
+     - fields/checkbox.css (termos/checkbox custom)
+     - fields/droparea.css (dropzone upload)
+   - layout.css controla o layout macro (main/aside e padding),
+     e forms.css controla a “organização” do formulário dentro do main.
+========================================================= */
+
+
+/* =========================
+   Import dos componentes
+   ========================= */
+
 @import url(fields/index.css);
+/* CONCEITO BÁSICO: @import
+   - Carrega CSS de outro arquivo dentro deste.
+   - Aqui, a ideia é: forms.css define estrutura do form,
+     e fields/index.css define aparência dos “campos/componentes”.
+
+   ⚠️ Observação importante de estudo:
+   - @import pode ter impacto em performance em alguns cenários,
+     porque pode atrasar carregamento (depende do pipeline/build).
+   - Em projetos com bundler (Vite/Webpack/PostCSS), isso costuma ser resolvido na build.
+   - Em projetos sem bundler, às vezes é melhor um único arquivo linkado no HTML. */
+
+
+/* =========================
+   Espaçamento geral do form
+   ========================= */
 
 form {
     margin-top: 3rem;
+    /* Cria espaço acima do formulário.
+     Onde isso aparece no HTML:
+     - O <form> vem logo após o texto introdutório (<h1> e <p>).
+     Isso dá “respiro” entre o texto e o primeiro fieldset.
+
+     CONCEITO BÁSICO: separação vertical (rhythm/spacing scale)
+     - você usa 3rem em vários lugares (consistência visual). */
 }
+
+
+/* =========================
+   Fieldsets (seções do form)
+   ========================= */
 
 fieldset {
     border: none;
+    /* Remove a borda padrão que alguns navegadores colocam no fieldset.
+     CONCEITO: browser defaults (estilos padrão do navegador). */
 
     display: grid;
+    /* CONCEITO BÁSICO: grid para empilhar campos
+     - Aqui o grid está sendo usado de forma simples: uma coluna implícita
+       e os itens empilhados verticalmente.
+     - É um jeito prático de criar espaçamento consistente entre elementos. */
+
     gap: 1.5rem;
+    /* Espaço entre os filhos diretos do fieldset (inputs, selects, wrappers etc.).
+     Vantagem: você não precisa colocar margin-bottom em cada campo. */
 }
+
+
+/* =========================
+   Legend (título da seção)
+   ========================= */
 
 legend {
     font: 600 1rem/1.25 var(--font-family);
+    /* Define tipografia do título da seção.
+     - 600: semibold
+     - 1rem: tamanho padrão (igual base)
+     - 1.25: line-height
+     - fonte vem de global.css (:root --font-family)
+
+     Onde aparece no HTML:
+     - <legend>Informações da criança</legend>
+     - <legend>Endereço residencial</legend>
+     - etc. */
+
     margin-bottom: 1.5rem;
+    /* Espaço abaixo do legend antes dos campos do fieldset.
+     Mesmo que fieldset tenha gap, esse margin aqui ajuda a separar o título do primeiro campo. */
 }
+
+
+/* =========================
+   Espaço entre seções
+   ========================= */
 
 fieldset+fieldset {
     margin-top: 3rem;
+    /* CONCEITO BÁSICO: seletor de irmãos adjacentes (+)
+     - fieldset + fieldset seleciona TODO fieldset que vem imediatamente após outro fieldset.
+     Na prática: adiciona espaço entre as seções, sem precisar colocar classes em cada uma.
+
+     Onde aparece no HTML:
+     - fieldset.child-info seguido do fieldset.address
+     - fieldset.address seguido do fieldset.gardian
+     - etc. */
 }
+
+
+/* =========================
+   Área de ações (botões)
+   ========================= */
 
 .actions-wrapper {
     margin-top: 3rem;
+    /* Espaço entre o fim do formulário (termos/últimos campos)
+     e a área dos botões */
+
     display: flex;
+    /* CONCEITO: Flexbox
+     - Coloca os botões em linha no desktop (lado a lado). */
+
     gap: 1rem;
+    /* Espaço entre os botões. */
 }
+
+/* Onde os botões em si são estilizados:
+   - fields/buttons.css controla:
+     - reset do button (all: unset)
+     - padding/cores/bordas
+     - .btn-primary e .btn-secondary
+   Aqui, forms.css só organiza o LAYOUT dos botões (linha/coluna). */
+
+
+/* =========================
+   Mobile (até 600px)
+   ========================= */
+
+@media (max-width: 600px) {
+    /* CONCEITO: breakpoint de celular
+     - até 600px costuma ser “telefone” (depende do projeto).
+     - aqui você altera apenas a área dos botões. */
+
+    .actions-wrapper {
+        flex-direction: column;
+        /* Empilha os botões (um abaixo do outro).
+       CONCEITO: em flex, a direção padrão é row (linha);
+       com column você transforma em coluna. */
+
+        align-items: stretch;
+        /* Faz os itens “esticar” para ocupar a largura do container.
+       (É a forma correta para ter botões largura total). */
+
+        width: 100%;
+        /* Garante que a wrapper ocupe toda a largura disponível. */
+    }
+
+    .actions-wrapper button {
+        width: 100%;
+        /* Faz cada botão ocupar 100% do container (melhor UX no mobile). */
+
+        box-sizing: border-box;
+        /* Reforço de segurança:
+       - garante que padding/borda não aumentem a largura além de 100%.
+       (você já aplica border-box globalmente em global.css, mas aqui não faz mal). */
+
+        text-align: center;
+        /* Centraliza o texto dentro do botão (visual típico de botão full-width). */
+    }
+}
+
+/* =========================================================
+   NOTAS DE ESTUDO (bem importantes)
+   1) Por que usar fieldset/legend?
+      - Semântica + acessibilidade: leitores de tela entendem “grupo de campos”.
+   2) Por que usar gap ao invés de margin-bottom em tudo?
+      - Menos CSS repetido e manutenção mais fácil.
+   3) Por que separar forms.css de fields/*.css?
+      - forms.css: estrutura do formulário (macro)
+      - fields/*.css: componentes (micro)
+      Isso deixa o projeto mais organizado e escalável.
+========================================================= */

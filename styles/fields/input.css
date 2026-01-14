@@ -1,99 +1,371 @@
+/* =========================================================
+   input.css (COMENTADO) — inputs, textarea, select e estados
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Define o “visual padrão” de campos (input/textarea/select)
+   - Define estilo de label (texto acima do campo)
+   - Define estados de foco (focus) e validação (invalid/valid)
+   - Personaliza:
+     - input type="date" (ícone calendário)
+     - select (ícone de seta)
+   - Ajusta layout do endereço (.address .flex) e responsividade
+
+   🔎 Onde aparece no HTML:
+   - Inputs:
+     <input id="fullname" ...>
+     <input type="date" id="birth" ...>
+     <input type="email" id="mail" required>
+     etc.
+   - Select:
+     <select name="gender" id="gender">...</select>
+   - Textarea:
+     <textarea id="medical-info">...</textarea>
+   - Labels:
+     <label for="fullname">Nome completo</label>
+   - Endereço (usa .address e .flex):
+     <fieldset class="address">
+       <div class="flex"> ... </div>
+     </fieldset>
+   - Wrapper que envolve cada campo:
+     <div class="input-wrapper"> ... </div>
+   - Mensagem de ajuda:
+     <input ...>
+     <small>...</small>
+   - Mensagem de erro:
+     <input required ...>
+     <div class="error">...</div>
+
+   🔗 Relação com outros arquivos:
+   - global.css fornece variáveis:
+     --text, --text-sm, --text-primary, --text-secondary,
+     --stroke-default, --stroke-highlight, --surface-secondary,
+     --surface-disabled, --semantic-error
+   - forms.css define espaçamento dos fieldsets, mas o visual do campo é aqui.
+   - global.css define .flex { display:flex }, e aqui você ajusta direção no mobile.
+========================================================= */
+
+
+/* =========================
+   Estilo base dos campos
+   ========================= */
+
 input,
 textarea,
 select {
     appearance: none;
+    /* CONCEITO: appearance
+     - Remove a aparência “nativa” do navegador em alguns controles (principalmente select).
+     - Ajuda a aplicar um design consistente.
+     ⚠️ Em alguns casos, appearance pode afetar elementos como select no iOS,
+       mas é comum em design systems. */
+
     width: 100%;
+    /* Faz o campo ocupar toda a largura disponível do container (geralmente .input-wrapper).
+     Isso evita campos “curtos” e melhora alinhamento. */
+
     border-radius: .5rem;
+    /* Cantos arredondados (0.5rem ≈ 8px). */
+
     border: 2px solid transparent;
+    /* Borda invisível (mas existente).
+     CONCEITO: truque de layout
+     - Você deixa a borda "reservada" para quando o campo estiver em foco (highlight),
+       evitando que o campo “mude de tamanho” quando a borda aparece. */
+
     outline: 1px solid var(--stroke-default);
+    /* Outline como “borda padrão”.
+     CONCEITO: outline vs border
+     - outline não ocupa espaço no box model (diferente de border).
+     - Aqui você usa outline para o estado normal e depois muda no focus. */
 
     padding: .75rem 1rem;
+    /* Espaço interno do campo:
+     - 0.75rem vertical
+     - 1rem horizontal
+     Isso melhora clique/toque e leitura. */
 
-    font: var(--text)
+    font: var(--text);
+    /* Aplica tipografia padrão (global.css: :root --text).
+     Isso garante que input e textarea tenham a mesma fonte do site. */
 }
+
+
+/* =========================
+   Label (texto do campo)
+   ========================= */
 
 label {
     font: var(--text-sm);
+    /* Tipografia menor, ideal para rótulos. */
+
     color: var(--text-secondary);
+    /* Cor do texto do label. */
 
     display: block;
+    /* Faz o label ocupar a linha inteira.
+     CONCEITO: elementos inline vs block
+     - label por padrão é inline.
+     - com block, você controla margin-bottom e garante que o input caia embaixo. */
+
     margin-bottom: .25rem;
+    /* Pequeno espaço entre label e campo. */
 }
+
+
+/* =========================
+   Estado de foco (focus)
+   ========================= */
 
 input:focus,
 select:focus,
 textarea:focus,
 input[type="date"]:focus-within {
     outline: .25rem solid var(--surface-secondary);
+    /* Quando o campo está focado (clicado/selecionado):
+     - cria um “halo” (outline mais grosso) com cor suave.
+     CONCEITO: feedback visual de foco (importantíssimo para UX e acessibilidade). */
+
     border-color: var(--stroke-highlight);
+    /* Ativa borda com cor de destaque (laranja).
+     Como você tinha border 2px transparente, agora ela aparece. */
+
     outline-offset: .1px;
+    /* CONCEITO: outline-offset
+     - distancia o outline do elemento.
+     - 0.1px é bem pequeno; na prática, é um “micro-ajuste” visual.
+     (Você poderia usar 1px sem grandes problemas.) */
 }
+
+
+/* =========================
+   Input do tipo date (calendário custom)
+   ========================= */
 
 input[type="date"] {
     position: relative;
+    /* Permite posicionar o ícone via pseudo-elemento ::before dentro do input.
+     (O input vira o “referencial” do absolute.) */
 
     &::-webkit-calendar-picker-indicator {
         opacity: 0;
+        /* CONCEITO: pseudo-elemento/vendor prefix
+       - Esse seletor atinge o ícone nativo do calendário no Chrome/Safari (WebKit/Blink).
+       - opacity:0 esconde o ícone padrão, para você usar o seu.
+       ⚠️ Observação: isso é específico de navegadores WebKit; em outros pode variar. */
     }
 
     &::before {
         content: "";
+        /* CONCEITO: pseudo-elemento
+       - ::before cria um “elemento virtual” antes do conteúdo.
+       - Você usa ele para desenhar o ícone dentro do campo. */
+
         position: absolute;
+
         background: url(../../assets/icons/calendar-03.svg) center/contain;
+        /* Ícone do calendário via background.
+       Caminho relativo ao input.css: styles/fields/input.css -> ../../assets/icons/... */
+
         right: 1rem;
+        /* Posiciona o ícone a 1rem da borda direita. */
+
         width: 1.25rem;
         height: 1.25rem;
+        /* Tamanho do ícone. */
 
         top: 50%;
         transform: translateY(-50%);
+        /* Centraliza verticalmente:
+       - top:50% coloca o topo do ícone no meio
+       - translateY(-50%) sobe metade da altura do ícone
+       CONCEITO: técnica clássica de centralização vertical. */
     }
 }
 
+
+/* =========================
+   Select com ícone de seta
+   ========================= */
+
 select {
     background: url(../../assets/icons/arrow-down-01.svg) no-repeat calc(100% - 1rem);
+    /* Coloca um ícone de seta como background do select.
+     - no-repeat: não repetir
+     - calc(100% - 1rem): posiciona a seta perto da borda direita, com 1rem de distância.
+     CONCEITO: “fake dropdown icon” para manter consistência visual. */
+
+    /* ⚠️ Observação importante:
+     Você não definiu background-size aqui.
+     Se em algum browser o ícone ficar grande, você pode adicionar:
+     background-size: 1.25rem;
+     background-position: calc(100% - 1rem) center;
+  */
 }
+
+
+/* =========================
+   Endereço (layout com flex)
+   ========================= */
 
 .address .flex {
     gap: 1.25rem;
+    /* Ajusta o espaçamento entre colunas (rua/número, cidade/estado).
+     Onde no HTML:
+     <fieldset class="address">
+       <div class="flex">...</div>
+     </fieldset>
+
+     Nota: display:flex do .flex vem do global.css.
+     Aqui você só controla o espaçamento dentro do contexto de endereço. */
 }
+
+
+/* =========================
+   Inputs desabilitados (visual de “não editável”)
+   ========================= */
 
 .input-wrapper:has([disabled]) {
     opacity: .5;
+    /* CONCEITO: :has()
+     - Seleciona o wrapper .input-wrapper se ele tiver um filho com [disabled].
+     - Isso deixa o bloco “apagado” quando o input está desabilitado.
+
+     Onde no HTML:
+     <div class="input-wrapper">
+       <input disabled ...>
+     </div>
+
+     ⚠️ Compatibilidade:
+     - :has() é moderno (bom lembrar em estudo).
+     - Em projetos atuais geralmente ok, mas é um detalhe importante. */
 }
+
+
+/* =========================
+   Regras específicas de <input>
+   ========================= */
 
 input {
     &[disabled] {
         background-color: var(--surface-disabled);
+        /* Fundo cinza claro para indicar desativado. */
 
         border: 1px solid var(--stroke-default);
+        /* Ajusta a borda (aqui você usa border ao invés de outline).
+       Pode ser uma decisão estética: deixar o disabled diferente. */
 
         color: var(--text-primary);
+        /* Texto mais forte para manter legível mesmo “apagado”. */
     }
 
     &:invalid {
         border: 0.125rem solid var(--semantic-error);
+        /* CONCEITO: validação nativa
+       - :invalid ativa quando o browser considera o campo inválido.
+       Exemplo no HTML:
+       <input type="email" required ...>
+       Se não for email válido, o browser marca invalid.
+
+       Obs.: aqui você usa border vermelho.
+       Isso funciona bem, mas lembre que o input base usa outline.
+       Você está misturando outline e border (não é errado, só precisa consistência). */
     }
 
     &+small {
         font: var(--text-sm);
+        /* Texto auxiliar menor. */
+
         color: #78716C;
+        /* Cor fixa (não variável). Poderia virar var também, mas não é obrigatório. */
 
         display: inline-block;
+        /* Permite aplicar margin-top e manter comportamento de bloco pequeno. */
+
         margin-top: .25rem;
+        /* Espaço entre input e a linha de ajuda. */
+
+        /* Onde no HTML:
+       <input ...>
+       <small>Principal responsável legal...</small> */
     }
 
     &[required]+.error {
         display: flex;
+        /* Mensagem de erro vira uma linha flex para ícone + texto. */
+
         align-items: center;
+        /* Alinha ícone e texto no meio. */
+
         gap: .25rem;
+        /* Espaço entre o ícone e a mensagem. */
 
         font: var(--text-sm);
+        /* Tipografia de erro menor. */
+
         color: var(--semantic-error);
+        /* Vermelho semântico vindo do global.css. */
 
         margin-top: .25rem;
+        /* Espaço entre o input e a mensagem de erro. */
+
+        /* Onde no HTML:
+       <input type="email" required>
+       <div class="error">
+         <img ...>
+         <span>Insira um e-mail válido</span>
+       </div>
+
+       CONCEITO: seletor de irmão adjacente (+):
+       - isso só funciona se .error vier imediatamente depois do input. */
     }
 
     &:not(:focus):valid+.error {
         display: none;
+        /* CONCEITO: lógica de exibição baseada em estado
+       - :valid: campo está válido
+       - :not(:focus): não está focado
+       - + .error: a div de erro logo após o input
+
+       Resultado:
+       - Quando o campo está válido e você saiu dele, esconde a mensagem de erro.
+
+       ⚠️ Atenção:
+       - Isso não mostra automaticamente a mensagem em “invalid”.
+         Ela aparece por padrão porque você definiu display:flex em &[required] + .error.
+       - Se quiser que a mensagem só apareça quando estiver inválido,
+         o padrão seria o oposto:
+           .error { display:none; }
+           input:invalid + .error { display:flex; }
+         Mas o seu modelo também funciona (só que “parte visível” depende de valid). */
     }
+}
+
+
+/* =========================
+   Mobile (até 600px)
+   ========================= */
+
+@media (max-width: 600px) {
+    .flex {
+        flex-direction: column;
+        /* CONCEITO: responsividade no flex
+       - No desktop, .flex (global.css) deixa itens em linha.
+       - No mobile, você empilha (coluna) para caber na tela.
+       Onde impacta no HTML:
+       - Fieldset endereço: rua/número e cidade/estado passam a ficar um embaixo do outro.
+
+       ⚠️ Importante:
+       Essa regra afeta TODO lugar que usar .flex no projeto.
+       No seu HTML, hoje parece OK (é basicamente o endereço).
+       Se futuramente você usar .flex em outro lugar e quiser manter linha no mobile,
+       você pode restringir:
+         .address .flex { flex-direction: column; }
+  */
+
+        .address .flex {
+            gap: 1rem;
+            /* Reduz o espaço entre campos no endereço para telas pequenas. */
+        }
+    }
+
 }

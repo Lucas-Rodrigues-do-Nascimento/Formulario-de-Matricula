@@ -1,4 +1,89 @@
-@import url(global.css);
-@import url(layout.css);
-@import url(forms.css);
+/* =========================================================
+   styles/index.css (COMENTADO) — arquivo “entrada” do CSS
+   =========================================================
+   ✅ O que este arquivo faz:
+   - É o CSS principal linkado no HTML.
+   - Ele importa (em ordem) os arquivos que montam o estilo do site:
+     1) global.css  → reset, variáveis, tipografia base, utilitários, overflow do body
+     2) layout.css  → layout macro (grid main/aside) + responsividade
+     3) forms.css   → organização do formulário (fieldset/legend/actions)
+        ↳ forms.css por sua vez importa fields/index.css (componentes)
 
+   🔎 Onde ele é “citado” no HTML:
+   - No <head> do seu HTML:
+     <link rel="stylesheet" href="styles/index.css">
+
+   ✅ Conceito básico (muito importante):
+   - A ordem dos imports define a “cascata”:
+     o que vem depois pode sobrescrever o que veio antes, se tiver mesma especificidade.
+   - Seu order está correto e é o padrão mais usado:
+     global → layout → componentes.
+========================================================= */
+
+
+/* =========================
+   1) Base global do projeto
+   ========================= */
+@import url(global.css);
+/* Traz:
+   - reset (* { margin/padding/box-sizing })
+   - variáveis (:root)
+   - body (font, cor, overflow)
+   - h1/h2 cor
+   - img responsiva
+   - utilitários .flex, .flex-1, .flex-2
+   - media queries do body (overflow no mobile)
+
+   Impacto no HTML:
+   - Afeta todos os elementos, porque é base/global. */
+
+
+/* =========================
+   2) Layout macro da página
+   ========================= */
+@import url(layout.css);
+/* Traz:
+   - #app (grid 2 colunas no desktop / 1 coluna no mobile)
+   - main e aside (padding, scroll)
+   - .main-container, .back, h1 (no contexto do main)
+   - .aside-container, h2 e span (no contexto do aside)
+   - media queries (900px e 600px)
+
+   Impacto no HTML:
+   - Organiza a página em main/aside e define o comportamento responsivo. */
+
+
+/* =========================
+   3) Estrutura do formulário
+   ========================= */
+@import url(forms.css);
+/* Traz:
+   - espaçamento do <form>
+   - layout dos <fieldset> (grid + gap)
+   - estilo do <legend>
+   - espaço entre seções (fieldset + fieldset)
+   - layout da .actions-wrapper (botões)
+   - media query dos botões (mobile)
+
+   Importante:
+   - forms.css também faz:
+     @import url(fields/index.css);
+     Ou seja, ao importar forms.css, você puxa automaticamente os componentes. */
+
+
+/* =========================================================
+   ⚠️ ALERTA IMPORTANTE (porque você está em Live Server / CSS puro)
+   =========================================================
+   - index.css está OK (é CSS puro).
+   - global.css e layout.css e forms.css também estão OK na maior parte,
+     MAS os arquivos importados via fields/index.css:
+       input.css, droparea.css, radio.css, checkbox.css, buttons.css
+     ainda têm sintaxe de nesting com "&" em vários trechos.
+
+   Resultado típico:
+   - O navegador/VSCode acusa erro de parsing (ex.: "} esperada").
+   - Parte do CSS pode ser ignorada e você vê “estilos sumindo”.
+
+   ✅ Para Live Server, a regra prática é:
+   - Converter todos os fields/*.css para CSS plano (sem &).
+========================================================= */

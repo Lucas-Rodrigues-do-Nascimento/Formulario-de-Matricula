@@ -1,51 +1,299 @@
+/* =============================================================================
+layout.css (COMENTADO PARA ESTUDO)
+-------------------------------------------------------------------------------
+OBJETIVO DESTE ARQUIVO
+- Controlar o "layout macro" da página: duas colunas (desktop) e uma coluna (mobile)
+- Definir onde o scroll acontece (desktop: dentro do <main>; mobile: no <body>)
+- Ajustar espaçamentos grandes (padding) e tipografia de títulos principais
+
+ONDE ISSO APARECE NO HTML
+- #app: <div id="app"> ... </div>
+- main: <main> ... </main>
+- .main-container: <div class="main-container"> ... </div>
+- .back: <div class="back"> ... </div>
+- aside: <aside> ... </aside>
+- .aside-container: <div class="aside-container"> ... </div>
+- h1: <h1>Formulário de matrícula</h1>
+- h2 e span: <h2>... <span>aprendizado</span> ...</h2>
+
+DEPENDÊNCIAS / RELAÇÃO COM OUTROS ARQUIVOS CSS
+- global.css:
+  - define variáveis usadas aqui (ex.: --surface-secondary, --text-highlight, --font-family)
+  - define comportamento padrão de imagens (img { max-width:100%; height:auto; })
+- forms.css e fields/*.css:
+  - cuidam da aparência dos componentes do formulário (inputs, radios, checkbox, botões)
+  - este layout.css só organiza o “esqueleto” da página (onde fica cada bloco)
+============================================================================= */
+
+
+/* =============================================================================
+#app: container raiz do layout (embrulha main + aside)
+HTML: <div id="app"> ... </div>
+============================================================================= */
 #app {
     display: grid;
+    /* CONCEITO BÁSICO: CSS Grid
+     - Grid é um sistema de layout 2D: você controla colunas e linhas.
+     - Aqui, os filhos diretos do #app (main e aside) viram itens do grid. */
+
     grid-template-columns: 51.25% 48.75%;
+    /* CONCEITO BÁSICO: colunas do grid
+     - Cria duas colunas no desktop.
+     - Percentuais dividem a largura total do #app entre main e aside.
+     - Na prática: main fica um pouco maior que aside. */
 
     height: 100vh;
+    /* CONCEITO BÁSICO: vh (viewport height)
+     - 100vh = altura total da área visível da tela.
+     - Isso cria uma página “travada” em tela cheia, comum em layouts split-screen.
+     - ⚠️ Em mobile, 100vh pode dar problemas por causa da barra do navegador/teclado,
+       por isso no @media vocês trocam por height:auto. */
+
     overflow: hidden;
+    /* CONCEITO BÁSICO: overflow
+     - Define o que acontece quando o conteúdo ultrapassa o tamanho do container.
+     - hidden = corta o que passar (sem scroll).
+     - Estratégia aqui: “tela fixa” e o scroll fica dentro do main (main { overflow:auto }).
+     - ⚠️ Se não houver scroll em nenhum lugar (body também com overflow hidden),
+       coisas podem “sumir” fora da tela. */
 }
 
+
+/* =============================================================================
+main: área principal da página (formulário)
+HTML: <main> ... </main>
+============================================================================= */
 main {
     overflow: auto;
+    /* CONCEITO BÁSICO: scroll interno
+     - auto cria rolagem apenas se o conteúdo for maior que a área disponível.
+     - Como #app está em 100vh e overflow hidden, o main vira a “área rolável”.
+     - Isso mantém o aside “fixo” visualmente no desktop. */
+
     padding: 4rem;
+    /* CONCEITO BÁSICO: padding
+     - Espaço interno do container (respiro do conteúdo).
+     - rem = relativo à fonte raiz (1rem normalmente ~16px).
+     - 4rem ~ 64px (um padding grande, bom para desktop). */
 
     & .main-container {
+        /* HTML: <div class="main-container"> ... </div> dentro do <main> */
+
         max-width: 33rem;
+        /* CONCEITO BÁSICO: max-width
+       - Limita a largura do conteúdo para evitar linhas muito longas.
+       - Ajuda legibilidade (especialmente em formulários). */
+
         margin-left: auto;
+        /* CONCEITO BÁSICO: centralização/alinhamento com margin auto
+       - margin-left:auto empurra o bloco para a direita ocupando o espaço livre à esquerda.
+       - Isso “encosta” o formulário mais para o centro considerando que existe o aside à direita.
+       - No mobile isso é cancelado (margin-left:0). */
     }
 
     & .back {
+        /* HTML: <div class="back"> ... </div> */
+
         display: flex;
+        /* CONCEITO BÁSICO: Flexbox
+       - Flex é layout 1D (linha ou coluna).
+       - Perfeito para alinhar ícone + texto lado a lado. */
+
         align-items: center;
+        /* Alinha verticalmente os itens no centro (ícone e texto ficam alinhados). */
+
         gap: .5rem;
+        /* Espaço entre os itens do flex sem precisar usar margin em cada um. */
+
         margin-bottom: 1.5rem;
+        /* Espaço abaixo do bloco “Voltar” para separar do título. */
     }
 
     & h1 {
+        /* HTML: <h1>Formulário de matrícula</h1> */
+
         font: 600 1.5rem/1.25 var(--font-family);
+        /* CONCEITO BÁSICO: shorthand font
+       - 600: peso (semi-bold)
+       - 1.5rem: tamanho
+       - 1.25: line-height (altura de linha)
+       - var(--font-family): variável definida em global.css (:root)
+       Obs.: h1/h2 também têm cor definida em global.css. */
+
         margin-bottom: .5rem;
+        /* Espaço entre o h1 e o texto abaixo (p). */
     }
 }
 
+
+/* =============================================================================
+aside: área secundária (branding + ilustração)
+HTML: <aside> ... </aside>
+============================================================================= */
 aside {
     background-color: var(--surface-secondary);
+    /* CONCEITO BÁSICO: variáveis CSS (custom properties)
+     - var(--surface-secondary) é definida em global.css dentro de :root.
+     - Vantagem: você troca a cor em um lugar só e reflete no site todo. */
+
     padding: 4rem;
+    /* Mesmo “respiro” do main no desktop: layout consistente. */
 
     & .aside-container {
-        max-width: 31rem;
+        /* HTML: <div class="aside-container"> ... </div> */
 
-        & > img {
+        max-width: 31rem;
+        /* Limita largura do conteúdo (texto e imagem) para não ficar exageradamente largo. */
+
+        &>img {
+            /* HTML: <img src="assets/Illustration.svg" ...> (filho direto de .aside-container)
+         ATENÇÃO: a logo (<img src="assets/logo.svg">) está dentro do <header>,
+         então NÃO é filho direto de .aside-container. */
+
             margin-top: 2rem;
+            /* Espaço acima da ilustração grande.
+         CONCEITO BÁSICO: seletor filho direto (>)
+         - Aplica só ao img que está diretamente dentro do container.
+         - Evita pegar a logo. */
         }
     }
 
     & h2 {
+        /* HTML: <h2> ... <span>aprendizado</span> ... </h2> */
+
         font: 600 2.5rem/1.25 var(--font-family);
+        /* Título grande no desktop (2.5rem ~ 40px). */
+
         margin-bottom: .5rem;
+        /* Espaço abaixo do h2 para separar do parágrafo (p). */
 
         & span {
+            /* HTML: o <span> dentro do h2 */
+
             color: var(--text-highlight);
+            /* Destaca apenas a palavra dentro do span.
+         --text-highlight vem de global.css (:root). */
         }
     }
 }
+
+
+/* =============================================================================
+RESPONSIVIDADE (até 900px)
+- Objetivo: empilhar em 1 coluna e colocar o aside como banner em cima
+============================================================================= */
+@media (max-width: 900px) {
+    /* CONCEITO BÁSICO: Media Queries
+     - max-width: 900px aplica regras quando a tela é “menor ou igual” a 900px.
+     - Isso cobre tablets e celulares (dependendo do aparelho). */
+
+    #app {
+        grid-template-columns: 1fr;
+        /* Troca o layout de 2 colunas para 1 coluna (tudo empilhado). */
+
+        height: auto;
+        /* Em mobile, deixa o container crescer conforme o conteúdo (evita bugs de 100vh). */
+
+        overflow: visible;
+        /* Não corta nada: permite que o conteúdo ultrapasse a área se necessário. */
+    }
+
+    /* aside (banner) em cima */
+    aside {
+        grid-row: 1;
+        /* CONCEITO BÁSICO: reordenação no Grid
+       - Como agora tem 1 coluna, usamos linhas do grid para definir ordem.
+       - aside na linha 1 = aparece primeiro (banner). */
+
+        padding: 1.5rem;
+        /* Reduz padding para caber melhor em telas menores. */
+    }
+
+    /* main (form) embaixo */
+    main {
+        grid-row: 2;
+        /* main na linha 2 = aparece depois do aside. */
+
+        overflow: visible;
+        /* Remove scroll interno do main no mobile:
+       o scroll natural vira o scroll da página (body).
+       IMPORTANTÍSSIMO porque em mobile scroll interno costuma piorar a UX. */
+
+        padding: 1.5rem;
+        /* Reduz padding (desktop era 4rem). */
+    }
+
+    main .main-container {
+        max-width: 100%;
+        /* Permite que o conteúdo ocupe a largura total do mobile. */
+
+        margin-left: 0;
+        /* Cancela o empurrão para a direita do desktop (margin-left:auto). */
+    }
+
+    aside .aside-container {
+        max-width: 100%;
+        /* Mesmo conceito: no mobile, usar 100% do espaço. */
+    }
+
+    aside h2 {
+        font-size: 1.75rem;
+        /* Diminui tamanho do título para não “quebrar” demais no mobile. */
+
+        line-height: 1.2;
+        /* Compacta a altura de linha, deixando o título mais “enxuto”. */
+    }
+
+    aside .aside-container>img {
+        width: 100%;
+        /* A ilustração tenta ocupar a largura disponível. */
+
+        max-width: 420px;
+        /* Limita para não ficar gigante em tablets maiores. */
+
+        margin: 1.25rem auto 0;
+        /* Centraliza horizontalmente (auto) e dá espaçamento em cima. */
+
+        display: block;
+        /* img por padrão é inline; block ajuda a centralizar e controlar melhor margens. */
+
+        /* RELAÇÃO COM global.css:
+       - global.css já tem: img { max-width:100%; height:auto; }
+       - aqui você está refinando (max-width específico + margin + display). */
+    }
+}
+
+
+/* =============================================================================
+RESPONSIVIDADE (até 600px)
+- Objetivo: ajustes finos para celulares menores
+============================================================================= */
+@media (max-width: 600px) {
+    /* Outro breakpoint para telas menores ainda. */
+
+    main,
+    aside {
+        padding: 1rem;
+        /* Padding menor ainda para aproveitar melhor a tela. */
+    }
+
+    aside .aside-container>img {
+        max-width: 360px;
+        /* Ilustração um pouco menor para caber melhor no celular. */
+    }
+}
+
+/* =============================================================================
+NOTAS IMPORTANTES (para estudo)
+1) Por que desktop usa overflow hidden + main overflow auto?
+   - Para manter “tela fixa” e rolar só o formulário, deixando o aside sempre visível.
+2) Por que no mobile muda para overflow visible + height auto?
+   - Porque mobile tem problemas com 100vh e scroll interno; o natural é o body rolar.
+3) Onde as cores e fontes vêm?
+   - global.css (:root) fornece variáveis usadas aqui: --font-family, --surface-secondary, --text-highlight.
+4) Onde os inputs e botões são estilizados?
+   - forms.css (margens e organização do form)
+   - fields/input.css (inputs, select, textarea, labels)
+   - fields/buttons.css (btn-primary / btn-secondary)
+   - fields/radio.css, fields/checkbox.css, fields/droparea.css (componentes)
+============================================================================= */

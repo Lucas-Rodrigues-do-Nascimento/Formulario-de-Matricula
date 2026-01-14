@@ -1,58 +1,270 @@
+/* =========================================================
+   radio.css (COMENTADO) — cards de seleção (radio custom)
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Transforma <input type="radio"> em “cards clicáveis” (UI custom)
+   - Organiza os cards em grid responsivo
+   - Controla estados visuais: normal, hover/focus e selecionado (checked)
+   - Ajusta responsividade (2 colunas no tablet, 1 coluna no celular)
+
+   🔎 Onde aparece no HTML:
+   - Wrapper do grupo:
+     <div class="radio-wrapper"> ... </div>
+   - Cada card:
+     <div class="radio-inner"> ... </div>
+   - “bolinha” custom do rádio:
+     <div class="radio-image"></div>
+   - Input real do rádio:
+     <input type="radio" ...>
+   Exemplos no seu HTML:
+   - Turno:
+     <input type="radio" name="study-shift" value="morning" id="morning">
+     <label for="morning">Manhã</label>
+   - Esporte:
+     <input type="radio" name="sport" id="football"> ...
+     <label for="football">Futebol</label>
+
+   🔗 Relação com outros arquivos:
+   - global.css fornece variáveis:
+     --stroke-default, --stroke-highlight
+   - global.css também define:
+     img { max-width: 100%; height: auto; } (para os ícones dentro do card)
+   - forms.css organiza o fieldset/spacing do formulário (macro).
+========================================================= */
+
+
+/* =========================
+   Espaço entre label e o grid
+   ========================= */
+
 label+.radio-wrapper {
     margin-top: 1rem;
+    /* CONCEITO BÁSICO: seletor de irmãos adjacentes (+)
+     - Seleciona .radio-wrapper que vem logo após um <label>.
+     - Isso dá um espaço entre o texto da pergunta e a grade de cards.
+
+     Onde isso acontece no HTML:
+     <label>Selecione o turno de estudo</label>
+     <div class="radio-wrapper">...</div>
+
+     Vantagem: você não precisa colocar uma classe extra no label. */
 }
+
+
+/* =========================
+   Grade de cards (grid)
+   ========================= */
 
 .radio-wrapper {
     display: grid;
+    /* CONCEITO: CSS Grid
+     - Excelente para fazer “cartões” em colunas com gaps consistentes. */
+
     grid-template-columns: repeat(auto-fit, minmax(7.5rem, 1fr));
+    /* CONCEITO: grid responsivo automático
+     - repeat(auto-fit, ...) cria quantas colunas couberem.
+     - minmax(7.5rem, 1fr):
+       a) cada coluna tem no mínimo 7.5rem (≈120px se 1rem=16px)
+       b) e pode crescer até 1fr (dividir espaço disponível)
+     Efeito: em telas maiores cabem mais cards por linha; em telas menores, menos.
+
+     ⚠️ No seu projeto, você depois "força" 2 colunas e 1 coluna via media queries
+     (isso deixa o comportamento mais previsível em mobile). */
+
     gap: 1rem;
+    /* Espaço entre os cards. */
 }
+
+
+/* =========================
+   Card individual (radio-inner)
+   ========================= */
 
 .radio-inner {
     border: 1px solid var(--stroke-default);
+    /* Borda padrão do card.
+     --stroke-default vem do global.css (:root). */
+
     border-radius: .5rem;
+    /* Cantos arredondados (0.5rem ≈ 8px). */
 
     display: grid;
+    /* Você usa grid dentro do card para empilhar e centralizar conteúdo.
+     CONCEITO: Grid também é útil “por dentro” de um componente. */
+
     justify-items: center;
+    /* Centraliza os itens horizontalmente dentro das células do grid.
+     Ajuda a manter ícone e label alinhados ao centro. */
+
     gap: .5rem;
+    /* Espaço vertical entre os elementos dentro do card (ícone, label etc.). */
 
     padding: 2rem .5rem .5rem;
+    /* Padding do card:
+     - topo 2rem: maior porque existe o "radio-image" no canto superior esquerdo
+     - laterais 0.5rem
+     - baixo 0.5rem
+     CONCEITO: padding assimétrico para acomodar elementos posicionados. */
 
     position: relative;
+    /* CONCEITO: posicionamento (relative)
+     - Permite posicionar elementos internos com position:absolute
+       tendo o card como referência.
+     Aqui é essencial para:
+     - o input invisível cobrindo o card inteiro
+     - o radio-image no canto (top/left) */
+}
+
+
+/* =========================
+   Input real (invisível) cobrindo o card
+   ========================= */
+
+.radio-inner {
 
     & input,
     & input:focus,
     & input:hover {
         all: unset;
-        position: absolute;
-        inset: 0;
-    }
+        /* CONCEITO: reset completo do input
+       - all: unset remove praticamente TODOS os estilos padrão do navegador.
+       - Isso é usado para evitar “bolinha” padrão do radio e outros comportamentos.
 
+       ⚠️ Atenção (conceito importante):
+       - all: unset pode afetar acessibilidade e foco se você não tratar bem estados.
+       - Você trata foco visual no card com :focus-within, o que ajuda bastante. */
+
+        position: absolute;
+        /* Faz o input virar um layer por cima. */
+
+        inset: 0;
+        /* CONCEITO: inset (atalho de top/right/bottom/left)
+       - inset:0 equivale a top:0; right:0; bottom:0; left:0;
+       Resultado: o input cobre 100% do card. */
+
+        /* Resultado prático:
+       - Clicar em qualquer lugar do card aciona o input.
+       - Você consegue estilo “card clicável” mantendo a funcionalidade real do radio. */
+    }
+}
+
+
+/* =========================
+   "Radio" custom (imagem no canto)
+   ========================= */
+
+.radio-inner {
     .radio-image {
         background-image: url(../../assets/icons/radio-default.svg);
+        /* Usa um SVG como background para simular o ícone do radio.
+       Onde está o arquivo:
+       - assets/icons/radio-default.svg
+       (caminho relativo ao radio.css: styles/fields/radio.css -> ../../assets/icons/...) */
 
         width: 1.5rem;
         height: 1.5rem;
+        /* Define tamanho do ícone. */
 
         position: absolute;
         top: .5rem;
         left: .5rem;
+        /* Posiciona o ícone no canto superior esquerdo do card. */
     }
+}
+
+
+/* =========================
+   Estado hover e focus (acessibilidade)
+   ========================= */
+
+.radio-inner {
 
     &:hover,
     &:focus-within {
         border: 1px solid var(--stroke-highlight);
+        /* Quando passa o mouse OU quando algo dentro recebe foco (teclado),
+       muda a borda para a cor de destaque.
+       CONCEITO: :focus-within é ótimo para acessibilidade,
+       porque o input invisível pode receber foco e ainda assim o card mostra feedback visual. */
 
         & .radio-image {
             background-image: url(../../assets/icons/radio-hover.svg);
-        }
-    }
-
-    &:has(:checked) {
-        border: 2px solid var(--stroke-highlight);
-
-        & .radio-image {
-            background-image: url(../../assets/icons/radio-checked.svg);
+            /* Troca o ícone para versão “hover”.
+         Arquivo: assets/icons/radio-hover.svg */
         }
     }
 }
+
+
+/* =========================
+   Estado selecionado (checked)
+   ========================= */
+
+.radio-inner {
+    &:has(:checked) {
+        border: 2px solid var(--stroke-highlight);
+        /* CONCEITO: :has()
+       - Seleciona o elemento pai (.radio-inner) se ele “contém” um filho que corresponde ao seletor.
+       - Aqui: se dentro do card existe um input :checked, o card muda a borda.
+
+       ✅ É uma forma elegante de estilizar o pai baseado no estado do filho.
+
+       ⚠️ Atenção importante:
+       - :has() é relativamente moderno. Em navegadores antigos pode não funcionar.
+       - Em projetos atuais costuma ser ok, mas vale lembrar em estudo. */
+
+        & .radio-image {
+            background-image: url(../../assets/icons/radio-checked.svg);
+            /* Troca o ícone para versão “selecionado”.
+         Arquivo: assets/icons/radio-checked.svg */
+        }
+    }
+}
+
+
+/* =========================================================
+   Responsividade
+   ========================================================= */
+
+/* Tablet e celulares grandes */
+@media (max-width: 900px) {
+    .radio-wrapper {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        /* Força 2 colunas para ficar previsível.
+       CONCEITO: minmax(0,1fr) é um truque para evitar overflow
+       quando há conteúdo que tenta ser maior que a coluna.
+
+       Por que sobrescrever o auto-fit?
+       - auto-fit é ótimo, mas às vezes em certas larguras ele cria colunas “apertadas” demais.
+       - Forçar 2 colunas cria consistência visual. */
+    }
+}
+
+/* Celulares pequenos */
+@media (max-width: 600px) {
+    .radio-wrapper {
+        grid-template-columns: 1fr;
+        /* Uma coluna: cards ficam grandes, fáceis de clicar (melhor UX mobile). */
+    }
+
+    .radio-inner {
+        padding: 1.5rem .75rem .75rem;
+        /* Reduz o padding no mobile:
+       - menos espaço desperdiçado
+       - mais conteúdo visível sem rolar tanto */
+    }
+}
+
+
+/* =========================================================
+   NOTAS DE ESTUDO (resumo)
+   =========================================================
+   1) Por que input cobre o card inteiro?
+      - Para permitir clique em qualquer área do card, mantendo a funcionalidade real do radio.
+   2) Por que :focus-within?
+      - Para acessibilidade via teclado: quando o input recebe foco, o card “acende”.
+   3) Por que trocar background-image ao invés de usar border-radius/::before?
+      - É uma abordagem visual simples: 3 SVGs (default/hover/checked).
+   4) Por que usar Grid no wrapper?
+      - Cards se organizam melhor em colunas responsivas com gap constante.
+========================================================= */

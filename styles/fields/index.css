@@ -1,5 +1,80 @@
+/* =========================================================
+   styles/fields/index.css (COMENTADO)
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Atua como um “hub” (arquivo índice) para importar todos os estilos
+     dos componentes de formulário (fields).
+   - Isso facilita: em vez de importar 5 arquivos em vários lugares,
+     você importa só este index.css (normalmente via forms.css).
+
+   🔎 Onde ele é “citado”:
+   - No seu forms.css você tem:
+     @import url(fields/index.css);
+   Então o encadeamento fica assim (fluxo de dependência):
+   - HTML -> styles/index.css
+   - styles/index.css -> (importa) global.css, layout.css, forms.css...
+   - forms.css -> (importa) fields/index.css
+   - fields/index.css -> (importa) input.css, droparea.css, radio.css, checkbox.css, buttons.css
+
+   🔎 Onde esses estilos são usados no HTML:
+   - input.css: inputs, textarea, select, labels, validação, endereço (.address .flex)
+   - droparea.css: .dropzone (upload)
+   - radio.css: .radio-wrapper e .radio-inner (cards)
+   - checkbox.css: .terms-wrapper e .checkbox-wrapper
+   - buttons.css: button, .btn-primary, .btn-secondary
+
+   ⚠️ Nota importante (você está em Live Server / CSS puro):
+   - Este arquivo é CSS puro e está ok.
+   - O que precisa de atenção são os arquivos importados:
+     - Se algum deles tiver nesting com `&`, o navegador/VS Code pode quebrar o parsing.
+     - Pelo que você mandou, radio.css, droparea.css, checkbox.css e buttons.css têm `&`.
+     - Para Live Server, o ideal é converter TODOS para CSS plano (sem `&`).
+========================================================= */
+
+
+/* =========================
+   Imports (ordem importa)
+   ========================= */
+
 @import url(input.css);
+/* Importa estilos base de campos (input/textarea/select/label).
+   Faz sentido vir primeiro, porque:
+   - define base de tipografia, padding, outline etc.
+   - outros componentes podem depender visualmente desse padrão */
+
 @import url(droparea.css);
+/* Importa estilos da área de upload (dropzone). */
+
 @import url(radio.css);
+/* Importa estilos dos cards de rádio (turno/esporte). */
+
 @import url(checkbox.css);
+/* Importa estilos do checkbox custom (termos). */
+
 @import url(buttons.css);
+/* Importa estilos dos botões (primary/secondary).
+   Geralmente faz sentido vir por último porque é um componente bem específico
+   e pode precisar sobrescrever defaults do botão. */
+
+
+/* =========================================================
+   NOTAS DE ESTUDO IMPORTANTES
+   =========================================================
+   1) Sobre @import em CSS puro (Live Server)
+      - Funciona, mas pode impactar performance (mais requisições).
+      - Para estudo e projetos pequenos, ok.
+      - Para produção, normalmente se usa build/concatenação.
+
+   2) Ordem dos imports (cascata)
+      - Em CSS, quem vem depois pode sobrescrever quem veio antes.
+      - Você está usando uma ordem lógica: base (input) -> componentes -> botões.
+
+   3) Diagnóstico rápido se “quebrar o CSS”
+      - Se um arquivo importado tiver erro de sintaxe (ex.: nesting `&` em CSS puro),
+        ele pode fazer o navegador “ignorar” partes do CSS.
+      - Isso costuma gerar comportamentos estranhos (estilos faltando).
+
+   Se você quiser, eu converto:
+   - radio.css, droparea.css, checkbox.css, buttons.css
+   para CSS plano (sem `&`) e te devolvo os 4 prontos, mantendo o mesmo visual.
+========================================================= */

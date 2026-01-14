@@ -1,41 +1,146 @@
+/* =========================================================
+   droparea.css (COMENTADO) — área de upload (dropzone)
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Cria uma “caixa” clicável para upload (estilo dropzone)
+   - Deixa o <input type="file"> invisível, mas cobrindo toda a área
+   - Aplica estados visuais: normal e hover/focus
+   - Ajusta padding no mobile
+
+   🔎 Onde aparece no HTML:
+   - Estrutura principal:
+     <div class="dropzone">
+       <input type="file" id="birth-file" name="birth-file">
+       <svg>...</svg>
+       <p>...</p>
+     </div>
+
+   🔗 Relação com outros arquivos:
+   - global.css fornece variáveis:
+     --stroke-default, --stroke-highlight, --surface-secondary, --text-tertiary
+   - global.css também define:
+     img { max-width:100%; height:auto; } (não afeta muito aqui, pois é svg inline)
+   - forms.css controla layout das seções (fieldset/legend), mas o visual do upload é aqui.
+
+   ⚠️ Observação (importante pelo seu erro anterior):
+   - Este arquivo usa nesting com "&" e também ":has()".
+   - Se o projeto estiver como CSS puro sem suporte a nesting, o VS Code pode acusar erro.
+   - Se você quiser, eu reescrevo este arquivo em CSS plano também.
+========================================================= */
+
+
+/* =========================
+   Caixa principal do upload
+   ========================= */
+
 .dropzone {
   border: 2px dashed transparent;
+  /* CONCEITO: border vs outline
+     - border faz parte do box model (pode afetar tamanho).
+     - você define 2px mas transparente para “reservar espaço”:
+       quando o border ficar colorido no hover/focus, o tamanho não “pula”. */
+
   outline: 1px dashed var(--stroke-default);
+  /* Outline tracejado padrão (borda externa visual).
+     --stroke-default vem do global.css (:root). */
+
   border-radius: .25rem;
+  /* Cantos arredondados (0.25rem ≈ 4px). */
 
   display: grid;
+  /* CONCEITO: Grid usado para centralizar conteúdo (ícone + texto). */
+
   justify-items: center;
+  /* Centraliza horizontalmente os filhos do grid (svg e p). */
+
   gap: .5rem;
+  /* Espaço entre ícone e texto. */
 
   text-align: center;
+  /* Centraliza o texto do <p> (e qualquer texto dentro). */
+
   padding: 1.75rem 1rem;
+  /* Espaçamento interno da dropzone:
+     - vertical: 1.75rem
+     - horizontal: 1rem
+     Bom para dar área de toque confortável no desktop. */
 
   position: relative;
+  /* CONCEITO: relative
+     Necessário para posicionar o input invisível (absolute) “preso” à dropzone. */
 
   & input {
+    /* HTML: <input type="file"...> dentro da dropzone */
+
     position: absolute;
+    /* Coloca o input por cima do card. */
+
     width: 100%;
     height: 100%;
+    /* Faz o input ocupar toda a área. */
+
     inset: 0;
+    /* Atalho de top/right/bottom/left = 0.
+       Resultado: o input cobre a dropzone toda. */
+
     opacity: 0;
+    /* Torna invisível, mas ainda clicável.
+       CONCEITO: elemento invisível mas interativo.
+       Isso preserva o comportamento real do upload (abre seletor de arquivo). */
   }
 
   & p {
+    /* HTML: <p> Clique aqui para ... </p> */
     color: #A8A29E;
+    /* Cor cinza para o texto de instrução.
+       Obs.: aqui você usou cor fixa (hex) em vez de variável.
+       Não é errado; é só uma decisão de design. */
   }
 
   &:hover,
   &:has(input:focus) {
+    /* CONCEITO: estados do componente
+       - :hover: quando o mouse passa por cima (desktop)
+       - :has(input:focus): quando o input (invisível) está focado (teclado/click)
+         Isso é ótimo para acessibilidade porque a dropzone “acende” ao receber foco.
+
+       ⚠️ Nota: :has() é moderno. Em navegadores antigos pode não funcionar,
+       mas em ambientes atuais tende a ser ok. */
+
     outline-width: 0;
+    /* Remove o outline tracejado no estado ativo,
+       deixando o border colorido ser o destaque principal. */
+
     border-color: var(--stroke-highlight);
+    /* Agora o border (antes transparente) fica laranja. */
+
     background-color: var(--surface-secondary);
+    /* Fundo suave para indicar estado de interação/ativo. */
 
     & p {
       color: var(--text-tertiary);
+      /* No hover/focus, muda a cor do texto para uma variável.
+         --text-tertiary vem do global.css. */
     }
 
     & svg path {
       stroke: var(--stroke-highlight);
+      /* Muda a cor do ícone SVG (traço) para o mesmo highlight.
+         Isso funciona porque o SVG no HTML usa path com stroke definido.
+         CONCEITO: estilizar SVG inline via CSS (muito útil). */
     }
+  }
+}
+
+
+/* =========================
+   Mobile (até 600px)
+   ========================= */
+
+@media (max-width: 600px) {
+  .dropzone {
+    padding: 1.25rem .75rem;
+    /* Reduz padding para caber melhor no celular.
+       Mantém área de toque boa sem “comer” espaço da tela. */
   }
 }

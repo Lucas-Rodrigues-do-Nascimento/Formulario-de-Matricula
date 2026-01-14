@@ -1,29 +1,175 @@
+/* =========================================================
+   buttons.css (COMENTADO) — estilos de botões (primary/secondary)
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Reseta o estilo padrão dos botões do navegador (para ter design consistente)
+   - Define um estilo base (tipografia, padding, bordas, cursor)
+   - Define duas variações:
+     - .btn-primary (botão principal: “Fazer matrícula”)
+     - .btn-secondary (botão secundário: “Salvar respostas”)
+   - Ajusta comportamento no mobile (remove margin-left:auto do secundário)
+
+   🔎 Onde aparece no HTML:
+   - Botão secundário:
+     <button class="btn-secondary" type="button">Salvar respostas</button>
+   - Botão primário:
+     <button class="btn-primary" type="submit">Fazer matrícula</button>
+
+   🔗 Relação com outros arquivos:
+   - forms.css organiza o layout dos botões:
+     - .actions-wrapper { display:flex; gap:1rem; }
+     - no mobile empilha e faz width:100%
+   - global.css fornece variáveis:
+     --text-highlight, --surface-secondary
+   - layout.css define padding do main/aside (onde esses botões ficam).
+========================================================= */
+
+
+/* =========================
+   Estilo base de TODOS os botões
+   ========================= */
+
 button {
     all: unset;
-    font-weight: 500;
-    color: var(--text-highlight);
-    padding: .75rem 1.5rem;
-    border-radius: .5rem;
-    cursor: pointer;
+    /* CONCEITO: reset total do botão
+     - Remove estilos padrão do navegador (borda, background, fonte, etc.).
+     - Isso facilita criar um design consistente.
 
+     ⚠️ Atenção (conceito importante):
+     - all: unset também remove o estilo de foco padrão (outline do navegador),
+       então você precisa garantir foco visível em :focus (você faz em alguns casos). */
+
+    font-weight: 500;
+    /* Peso médio para o texto do botão (um pouco mais forte que texto comum). */
+
+    color: var(--text-highlight);
+    /* Cor padrão do texto do botão (laranja).
+     Variável vem do global.css (:root). */
+
+    padding: .75rem 1.5rem;
+    /* Espaçamento interno:
+     - vertical: 0.75rem
+     - horizontal: 1.5rem
+     CONCEITO: aumenta a área clicável (importante para UX). */
+
+    border-radius: .5rem;
+    /* Cantos arredondados (0.5rem ~ 8px). */
+
+    cursor: pointer;
+    /* Muda o cursor para “mãozinha”, indicando que é clicável (desktop). */
+
+    /* 🔎 Observação de estudo:
+     O botão ainda funciona como botão porque ele continua sendo <button> no HTML.
+     O CSS só muda o visual.
+     No seu HTML:
+     - type="button" (não envia o form)
+     - type="submit" (envia o form) */
+}
+
+
+/* =========================
+   Botão primário (ação principal)
+   ========================= */
+
+button {
     &.btn-primary {
+        /* Seleciona <button class="btn-primary"> */
+
         color: white;
+        /* Texto branco, para contraste com fundo laranja. */
+
         background-color: #E43A12;
+        /* Fundo do botão primário.
+       Note que essa cor é igual ao --text-highlight do global.css,
+       mas aqui você colocou o valor direto em hex.
+       (Não é errado, só menos “centralizado” do que usar a variável.) */
 
         &:hover,
         &:focus {
+            /* CONCEITO: estados
+         - hover: feedback visual quando passa o mouse
+         - focus: feedback quando navega por teclado (muito importante) */
+
             background-color: #F3541C;
+            /* Cor do fundo no hover/focus (um pouco mais clara). */
         }
     }
+}
 
+
+/* =========================
+   Botão secundário (ação alternativa)
+   ========================= */
+
+button {
     &.btn-secondary {
+        /* Seleciona <button class="btn-secondary"> */
+
         margin-left: auto;
+        /* CONCEITO: layout em flex
+       - Em um container flex (como .actions-wrapper), margin-left:auto empurra o elemento
+         para o canto direito, separando do outro botão.
+       Onde isso é definido:
+       - forms.css: .actions-wrapper { display:flex; gap:1rem; }
+       Resultado no desktop:
+       - “Salvar respostas” vai para a direita (ou cria separação), dependendo da ordem.
+
+       ⚠️ No mobile (quando os botões empilham), isso pode causar comportamento ruim,
+       por isso você zera essa margem no @media (max-width: 600px). */
+
         border: 1px solid var(--text-highlight);
+        /* Borda laranja usando variável.
+       Esse estilo (sem background) reforça que é uma ação secundária. */
 
         &:hover,
         &:focus {
             color: #E43A12;
+            /* Mantém o texto laranja no estado de interação (aqui é redundante, pois já é laranja).
+         Pode ser útil se em algum momento o botão mudar cor em outro estado. */
+
             outline: .25rem solid var(--surface-secondary);
+            /* Cria um “halo” de foco/hover com cor suave (surface-secondary).
+         CONCEITO: foco visível (acessibilidade).
+         Ajuda quem usa teclado a ver onde está. */
         }
     }
 }
+
+
+/* =========================
+   Ajuste para mobile
+   ========================= */
+
+@media (max-width: 600px) {
+    button.btn-secondary {
+        margin-left: 0;
+        /* Quando os botões ficam em coluna (forms.css), margin-left:auto não faz sentido.
+       Isso garante que o botão secundário ocupe o fluxo normal e não cause “vazamento”/alinhamento estranho.
+
+       Onde isso combina:
+       - forms.css (mobile): .actions-wrapper { flex-direction: column; align-items: stretch; }
+       - forms.css (mobile): .actions-wrapper button { width:100%; }
+       Resultado:
+       - Os dois botões ficam empilhados e com largura total no celular. */
+    }
+}
+
+/* =========================================================
+   NOTAS DE ESTUDO (bem úteis)
+   =========================================================
+   1) all: unset é poderoso, mas exige que você trate :focus bem
+      - Você tratou no primary (focus muda background).
+      - No secondary você tratou (outline).
+      - Se quiser reforçar acessibilidade, poderia criar um foco base para todo button.
+
+   2) Primary vs Secondary
+      - Primary: fundo preenchido (ação principal)
+      - Secondary: contorno (ação alternativa)
+
+   3) Consistência de variáveis
+      - Você usa var(--text-highlight) em alguns lugares,
+        mas no primary usa o hex direto (#E43A12 / #F3541C).
+      - Para estudo/manutenção, é comum criar variáveis também para:
+        --brand-primary e --brand-primary-hover, por exemplo.
+========================================================= */
+

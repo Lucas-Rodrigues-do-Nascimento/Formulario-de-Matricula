@@ -1,53 +1,246 @@
+/* =========================================================
+   global.css (COMENTADO) — estilos globais do projeto
+   =========================================================
+   ✅ O que este arquivo faz:
+   - Zera margens/paddings padrão do navegador (reset)
+   - Define variáveis CSS (cores, fontes) em :root
+   - Define tipografia base do site no body
+   - Define comportamentos globais (imagens responsivas, utilitários flex)
+   - Define regras específicas para mobile (overflow)
+
+
+   ⚠️ Conceito-chave:
+   - CSS é “cascata”: regras globais (aqui) valem para tudo,
+     e arquivos mais específicos (layout.css, forms.css, fields/*.css)
+     sobrescrevem quando necessário.
+*/
+
+/* =========================
+   RESET BÁSICO (browser)
+   ========================= */
+
 * {
     margin: 0;
+    /* CONCEITO: User Agent Stylesheet
+     Navegadores aplicam margens padrão em vários elementos (ex.: body, h1, p).
+     Zerar evita diferenças entre navegadores e te dá controle total no CSS. */
+
     padding: 0;
+    /* Zera paddings padrão (menos comum do que margin, mas existe em alguns elementos). */
+
     box-sizing: border-box;
+    /* CONCEITO: Box Model
+     - content-box (padrão): width/height NÃO incluem padding e border
+       (isso pode causar “estouro” de layout).
+     - border-box: width/height INCLUEM padding e border.
+     Isso facilita muito responsividade e evita overflow lateral.
+     ✅ Boa prática moderna: aplicar border-box globalmente. */
 }
+
+/* =========================
+   :root (variáveis CSS)
+   ========================= */
 
 :root {
+    /* CONCEITO: CSS Custom Properties (variáveis CSS)
+     - Tudo que começa com -- pode ser reutilizado com var(--nome).
+     - Ajuda a manter consistência e facilita trocar tema/cores.
+
+     Onde aparece no projeto:
+     - layout.css usa: var(--surface-secondary), var(--font-family), var(--text-highlight)
+     - fields/input.css usa: var(--stroke-default), var(--stroke-highlight), var(--surface-secondary), etc.
+     - fields/buttons.css usa: var(--text-highlight), var(--surface-secondary)
+  */
+
     --font-family: 'Poppins', sans-serif;
+    /* Define a fonte principal do site.
+     Onde é “puxada”:
+     - Você carrega Poppins no HTML via Google Fonts:
+       <link href="https://fonts.googleapis.com/css2?family=Poppins...">
+     - Aqui você declara que a família padrão será Poppins (com fallback sans-serif). */
+
     --text: 400 1rem/1.5 var(--font-family);
+    /* Variável de TIPOGRAFIA (shorthand de font):
+     - 400: peso da fonte
+     - 1rem: tamanho (geralmente 16px por padrão)
+     - 1.5: line-height (altura da linha)
+     - var(--font-family): família
+     Onde é usado:
+     - body { font: var(--text); } (logo abaixo)
+     CONCEITO: padronizar tipografia com uma “receita” reutilizável. */
+
     --text-sm: 400 0.875rem/1.4 var(--font-family);
+    /* Texto menor (ex.: labels, mensagens).
+     Onde é usado:
+     - fields/input.css: label { font: var(--text-sm); }
+     - fields/input.css: small e .error também usam variações similares. */
 
     --text-primary: #292524;
+    /* Cor principal de texto (geralmente títulos). */
+
     --text-secondary: #57534E;
+    /* Cor secundária (texto comum). Onde é usada:
+     - body { color: var(--text-secondary); } */
+
     --text-tertiary: #8F8881;
+    /* Cor terciária (textos mais “apagados”).
+     Onde é usada:
+     - droparea.css usa em hover para o <p> (text-tertiary). */
+
     --text-highlight: #E43A12;
+    /* Cor de destaque (call-to-action).
+     Onde é usada:
+     - layout.css: aside h2 span
+     - buttons.css: cor padrão e borda do btn-secondary
+     - checkbox.css: strong em destaque
+     CONCEITO: “accent color” do design. */
 
     --surface-primary: #FFFFFF;
+    /* Fundo primário (normalmente o fundo do conteúdo). */
+
     --surface-secondary: #FEE7D6;
+    /* Fundo secundário (painel/aside, hover, etc.).
+     Onde é usada:
+     - layout.css: aside background
+     - droparea.css: hover da dropzone
+     - input.css: foco (outline) usa essa variável também */
+
     --surface-disabled: #E7E5E4;
+    /* Fundo de inputs desabilitados.
+     Onde é usada:
+     - fields/input.css: input[disabled] { background-color: var(--surface-disabled) } */
 
     --stroke-default: #D6D3D1;
+    /* Cor de “borda padrão” (strokes/outlines).
+     Onde é usada:
+     - input.css: outline padrão dos campos
+     - droparea.css: outline tracejado padrão
+     - radio.css: borda padrão do card */
+
     --stroke-highlight: #F3541C;
+    /* Cor de borda/realce no hover/focus/checked.
+     Onde é usada:
+     - input.css (focus)
+     - droparea.css (hover/focus)
+     - radio.css (hover/checked) */
+
     --semantic-error: #DC2626;
+    /* Cor semântica de erro.
+     Onde é usada:
+     - input.css: input:invalid e .error (validação de email, etc.)
+     CONCEITO: cor “semântica” = representa estado (erro), não um elemento específico. */
 }
+
+/* =========================
+   Estilos base do body
+   ========================= */
 
 body {
     overflow: hidden;
+    /* CONCEITO: overflow do body
+     - hidden: impede o body de rolar (scroll travado).
+     Por que isso foi usado:
+     - No desktop, seu layout é "tela travada" em #app (100vh) e o scroll fica no main.
+     Onde isso conversa com outro arquivo:
+     - layout.css: #app { height: 100vh; overflow: hidden; }
+     - layout.css: main { overflow: auto; }
+     Isso cria o padrão: “rolar só o formulário”.
+
+     ⚠️ No mobile isso costuma atrapalhar (por isso você sobrescreve no @media). */
 
     font: var(--text);
+    /* Aplica a tipografia base do site (definida em :root).
+     Isso afeta todo texto do body (p, spans etc.) por herança. */
+
     color: var(--text-secondary);
+    /* Define cor padrão do texto (herdado pelos filhos, exceto onde sobrescrever). */
 }
+
+/* =========================
+   Títulos
+   ========================= */
 
 h1,
 h2 {
     color: var(--text-primary);
+    /* Define títulos com cor mais forte.
+     Onde aparece no HTML:
+     - <h1>Formulário de matrícula</h1> (main)
+     - <h2>Porque cada momento de ...</h2> (aside)
+     Onde pode ser complementado:
+     - layout.css define tamanho/peso de h1/h2 dentro de main/aside. */
 }
+
+/* =========================
+   Imagens responsivas
+   ========================= */
 
 img {
     max-width: 100%;
+    /* CONCEITO: imagem responsiva
+     Impede que a imagem fique maior que o container e cause overflow horizontal.
+     Onde aparece no HTML:
+     - logo do aside: <img src="assets/logo.svg">
+     - ilustração: <img src="assets/Illustration.svg">
+     - ícones de setinha/alerta/etc. */
+
     height: auto;
+    /* Mantém proporção da imagem (evita distorção). */
 }
+
+/* =========================
+   Utilitários Flex
+   ========================= */
 
 .flex {
     display: flex;
+    /* CONCEITO: classe utilitária
+     Você aplica .flex no HTML quando quer layout em linha.
+     Onde aparece no HTML:
+     - <div class="flex"> (no fieldset de endereço, para rua/número e cidade/estado) */
 }
 
 .flex-1 {
-    flex: 1
+    flex: 1;
+    /* Item flex que ocupa 1 “parte” do espaço disponível.
+     Onde aparece no HTML:
+     - <div class="input-wrapper flex-1"> (Número / Estado) */
 }
 
 .flex-2 {
-    flex: 2
+    flex: 2;
+    /* Item flex que ocupa 2 “partes” do espaço (o dobro do flex-1).
+     Onde aparece no HTML:
+     - <div class="input-wrapper flex-2"> (Rua / Cidade) */
+}
+
+/* =========================
+   Responsividade (mobile)
+   ========================= */
+
+@media (max-width: 900px) {
+    body {
+        overflow: auto;
+        /* No mobile/tablet, libera o scroll do body.
+       Isso é essencial porque:
+       - no mobile você muda o layout para 1 coluna (layout.css)
+       - e precisa conseguir rolar a página inteira (main + aside).
+
+       Onde é “ativado” junto:
+       - layout.css: @media (max-width:900px) muda #app para height:auto e overflow:visible
+       Assim o conteúdo não é cortado e o scroll funciona. */
+    }
+}
+
+@media (max-width: 600px) {
+    body {
+        overflow-x: hidden;
+        /* “Cinto de segurança” contra overflow horizontal em celular.
+       Se algum componente (botões, radio cards, dropzone, etc.) estiver maior que a tela,
+       isso evita aparecer a rolagem lateral.
+
+       ⚠️ Importante:
+       - ideal é corrigir a causa do overflow (ex.: width, padding, min-width),
+         mas esta regra evita o “arrasto” lateral no celular. */
+    }
 }
